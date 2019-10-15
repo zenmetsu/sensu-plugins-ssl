@@ -1,35 +1,37 @@
+sudo: true
+service: docker
 language: ruby
 cache:
 - bundler
 install:
 - bundle install
+before_install:
+- sudo iptables -L DOCKER || ( echo "DOCKER iptables chain missing" ; sudo iptables
+  -N DOCKER )
+- gem install bundler -v 1.15
 rvm:
-- 2.0
-- 2.1
-- 2.2
-- 2.3.0
 - 2.4.1
 notifications:
   email:
     recipients:
-    - sensu-plugin@sensu-plugins.io
+    - vespira@gmail.com
     on_success: change
     on_failure: always
 script:
-- bundle exec rake default
 - gem build sensu-plugins-ssl.gemspec
 - gem install sensu-plugins-ssl-*.gem
+- bundle exec rake default
+before_deploy:
+- bash -c "[ ! -d bonsai/ ] && git clone https://github.com/sensu/sensu-go-bonsai-asset.git
+  bonsai || echo 'bonsai/ exists, skipping git clone'"
 deploy:
-  provider: rubygems
-  api_key:
-    secure: Kr0fckXoukenIVyWMFVYAi+llLNNKRtfnZatnGDgqQON+vRXuuLGnta2TyBEhmPdiRU8nax5VL3K5uNSkxWmPi7Vtzizz453KShtnFGXuq73H37WIvcJ4bLcvz5K/1RWNEcXMN7/6hgSeDBUzcliFyph4p00WhdhqgFttf0UI/Y=
-  gem: sensu-plugins-ssl
+- provider: script
+  script: chmod +x bonsai/ruby-runtime/travis-build-ruby-plugin-assets.sh && bonsai/ruby-runtime/travis-build-ruby-plugin-assets.sh
+    sensu-plugins-ssl
+  skip_cleanup: true
   on:
     tags: true
     all_branches: true
-    rvm: 2.0
-    rvm: 2.1
-    rvm: 2.2
-    rvm: 2.3.0
     rvm: 2.4.1
-    repo: sensu-plugins/sensu-plugins-ssl
+dd:
+  secure: HQXwPAWbiKzG6TpFH4Jwp+HUSkU3pi4fQH8ke4yoZ4zMj6esL2yykXsMO0bi+5iVyMBEhIl73N0pp7DyqgJYyOj0f1OSQvZ72DJRoBtYAhB0yxo/j9u5KUaAY0r8IWzZcsERhes26z1Wxigg/SLnnzXSeHNtOtbNF9VmiPm0jZUIz4rLezzJDtxkNkSnGW+m942JMXfupus86RMDgLwligU0kbkhT9FObzuag5Sp9gB5hwZapfyJnkypfuec/JrX0BnLYUvqSDY/bCmzaEUhfqvl6tuXAHQBNgmN/1/Vj/f+kUkoDX0qklMS+p7uatKt7Nxib5aWphQ9pV27DEAOWk0fJf4GAOsFjkSsm2UBKRdNtP95Rlz2tluVOh0Mg4BRnIjFIngr0SXEY9WGK9FfwtC0RGV+HtPOmRCJRk8TLfe+KxMDIMimokfWDih1ZknJh23p9yf2aSR1AhU4HOhxUfkX5hDxzDyitd0tDg327JJeCwKiaZ/RvYseS8CN10pfWjI+19402ecW5UFx5+DnHD2Z5NM5jz79SHcXpgj/BY2ANygrSaM0ZzhBgghVivEBsDVxb49yEpRn8P+rKNwGAcerwFrcfo7iGI3OqxfKT0QlbpBZ/0+PR/L8O257eS9kiJP0GRgrgaOI7JyI4IzuqAnYtWLw/ifk1L4fL3j63zY=
