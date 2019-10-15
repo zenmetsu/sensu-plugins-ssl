@@ -35,7 +35,7 @@ class CheckSSLHSTSPreloadable < Sensu::Plugin::Check::CLI
          description: 'The domain to run the test against',
          short: '-d DOMAIN',
          long: '--domain DOMAIN',
-         required: true
+         default: 'localhost'
 
   option :api_url,
          description: 'The URL of the API to run against',
