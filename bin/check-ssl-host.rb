@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# encoding: UTF-8
+
 #  check-ssl-host.rb
 #
 # DESCRIPTION:
@@ -42,7 +42,7 @@ require 'socket'
 # Check SSL Host
 #
 class CheckSSLHost < Sensu::Plugin::Check::CLI
-  STARTTLS_PROTOS = %w(smtp imap).freeze
+  STARTTLS_PROTOS = %w[smtp imap].freeze
 
   check_name 'check_ssl_host'
 
